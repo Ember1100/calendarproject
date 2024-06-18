@@ -1,0 +1,11 @@
+server:
+  port: 8016
+datasource:
+  driverName: mysql
+  host: 120.77.42.122
+  port: 3306
+  database: gin_gorm
+  username: root
+  password: "000719"
+  charset: utf8
+  loc: Asia/Shanghai
