@@ -5,6 +5,7 @@ import (
 
 	"github.com/calendarproject/common"
 	"github.com/calendarproject/router"
+	"github.com/calendarproject/ws"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 )
@@ -19,6 +20,8 @@ func main() {
 	//使用gin
 	r := gin.Default()
 	r = router.CollectRoute(r)
+	// 注册WebSocket路由
+	r.GET("/ws", ws.WebSocketHandler)
 	port := viper.GetString("server.port")
 
 	if port != "" {
