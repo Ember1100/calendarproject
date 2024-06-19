@@ -34,13 +34,9 @@ type PostController struct {
 }
 
 func NewPostController() IPostController {
-
 	db := common.GetDb()
-
 	_ = db.AutoMigrate(&model.SysCalendar{})
-
 	return PostController{DB: db}
-
 }
 
 func (p PostController) PageList(ctx *gin.Context) {
@@ -99,6 +95,7 @@ func (p PostController) Create(ctx *gin.Context) {
 	post := model.SysCalendar{}
 	post.CreateID = requestPost.CreateID
 	post.WarnContext = requestPost.WarnContext
+	post.SendType = requestPost.SendType
 
 	time, err := time.Parse("2006-01-02 15:04:05", requestPost.WarnDate)
 	if err == nil {

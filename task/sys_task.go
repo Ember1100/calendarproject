@@ -1,41 +1,71 @@
-package main
+package task
 
 import (
 	"fmt"
 	"time"
 
-	"github.com/gin-gonic/gin"
+	"github.com/calendarproject/common"
+	"github.com/calendarproject/model"
+	"gorm.io/gorm"
 )
 
-func runPeriodicTasks(r *gin.Engine) {
-	// 设置多个定时任务时间点
-	targetTimes := []time.Time{
-		time.Date(2024, 6, 18, 22, 36, 57, 333000000, time.Local),
-		time.Date(2024, 6, 18, 22, 56, 20, 926000000, time.Local),
-	}
-
-	tickers := make([]*time.Ticker, len(targetTimes))
-
-	for i, targetTime := range targetTimes {
-		tickers[i] = time.NewTicker(time.Until(targetTime))
-		defer tickers[i].Stop()
-
-		go func(idx int) {
-			for {
-				select {
-				case <-tickers[idx].C:
-					runTask(r, idx)
-					// 重置定时器,等待下一次执行
-					tickers[idx] = time.NewTicker(time.Until(targetTimes[idx].Add(24 * time.Hour)))
-				}
-			}
-		}(i)
-	}
+type SysTask struct {
+	DB *gorm.DB
 }
 
-func runTask(r *gin.Engine, idx int) {
-	fmt.Printf("执行定时任务 %d...\n", idx+1)
+func NewSysTask() SysTask {
+	db := common.GetDb()
+	return SysTask{DB: db}
+}
 
-	// 在这里添加你需要执行的任务代码
-	// 例如: 更新数据库、发送邮件等
+func (s SysTask) SendMessTask() {
+	var posts []model.SysCalendar
+	nowTime := time.Now()
+	s.DB.Where("status = ? and warn_date <= ?  ", 0, nowTime).Find(&posts)
+	if len(posts) == 0 {
+		return
+	}
+	for i := 0; i < len(posts); i++ {
+		value := posts[i]
+		if value.SendType == "" || len(value.SendType) == 0 {
+			continue
+		} else if value.SendType == "email" {
+			SendByEmail(value)
+		} else if value.SendType == "phone" {
+			SendByPhone(value)
+		}
+		posts[i].Status = 1
+	}
+	var record []model.SysCalendarSendRecord
+	//更新
+	for _, value := range posts {
+		if value.Status == 1 {
+			record = append(record, model.SysCalendarSendRecord{SysCalendarID: value.ID, SendAt: nowTime})
+			if err := s.DB.Model(&model.SysCalendar{}).Where("id = ?", value.ID).Update("status", 1).Error; err != nil {
+				fmt.Println(value.ID, "更新失败")
+				fmt.Println(err)
+			}
+		}
+	}
+
+	//记录发送
+	s.SendRecord(record, nowTime)
+}
+
+// 邮箱发送
+func SendByEmail(calendar model.SysCalendar) {
+
+}
+
+// 手机发送
+func SendByPhone(calendar model.SysCalendar) {
+
+}
+
+func (s SysTask) SendRecord(record []model.SysCalendarSendRecord, nowTime time.Time) {
+	if len(record) == 0 {
+		return
+	}
+	s.DB.AutoMigrate(&model.SysCalendarSendRecord{})
+	s.DB.Create(&record)
 }

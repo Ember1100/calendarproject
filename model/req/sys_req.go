@@ -12,4 +12,5 @@ type PostRequest struct {
 	WarnDate string `json:"warn_date" binding:"required"`
 
 	WarnContext string `json:"warn_content" binding:"required"`
+	SendType    string `json:"send_type" binding:"required"`
 }
