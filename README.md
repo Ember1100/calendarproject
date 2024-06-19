@@ -10,7 +10,7 @@ ws://localhost:8016/ws?uid=2&mesType=a11
 
 http测试
 
-![屏幕截图 2024-06-19 160531](./images/屏幕截图 2024-06-19 160818.png)
+![](./images/屏幕截图 2024-06-19 160818.png)
 
 websocket测试
 
