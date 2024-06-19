@@ -9,7 +9,7 @@ type SysCalendar struct {
 
 	WarnContext string `json:"warn_context" gorm:"type:text;not null"` //提醒内容
 
-	CreateID uint `json:"create_id"` //创建人id
+	CreateID uint64 `json:"create_id"` //创建人id
 
 	CreatedAt time.Time `json:"create_at"`
 

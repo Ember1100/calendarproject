@@ -7,7 +7,7 @@ type PageQuery struct {
 }
 
 type PostRequest struct {
-	CreateID uint `json:"create_id" binding:"required"`
+	CreateID uint64 `json:"create_id" binding:"required"`
 
 	WarnDate string `json:"warn_date" binding:"required"`
 

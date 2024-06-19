@@ -6,6 +6,7 @@ import (
 
 	"github.com/calendarproject/common"
 	"github.com/calendarproject/model"
+	"github.com/calendarproject/ws"
 	"gorm.io/gorm"
 )
 
@@ -34,6 +35,8 @@ func (s SysTask) SendMessTask() {
 		} else if value.SendType == "phone" {
 			SendByPhone(value)
 		}
+		//ws推送
+		ws.SendMessage(value.CreateID, value.WarnContext, 0)
 		posts[i].Status = 1
 	}
 	var record []model.SysCalendarSendRecord
