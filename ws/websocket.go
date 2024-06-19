@@ -118,6 +118,9 @@ func removeUnSend(key uint64, mes string) {
 	messages, ok := unSendMsg[key]
 	if ok {
 		delete(messages, mes)
+		if len(messages) == 0 {
+			delete(unSendMsg, key)
+		}
 	}
 }
 
